@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio-Growth Analytics | Animal Husbandry Malaysia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
+        .math-font { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800">
+
+    <header class="bg-emerald-800 text-white py-8 px-4 shadow-lg">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">Calculus in Animal Husbandry</h1>
+            <p class="text-emerald-100 text-lg">Optimizing Broiler Growth Rates in Malaysian Poultry Systems</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
+        
+        <section class="grid md:grid-cols-2 gap-8">
+            <div class="glass-card p-6 rounded-2xl shadow-sm">
+                <h2 class="text-2xl font-bold text-emerald-700 mb-4 flex items-center">
+                    <span class="mr-2">🌱</span> The Bioscience Scenario
+                </h2>
+                <div class="space-y-4 text-slate-600 leading-relaxed">
+                    <p>
+                        In Malaysian commercial broiler production (e.g., Cobb 500), understanding the <strong>instantaneous growth rate</strong> is vital for optimizing Feed Conversion Ratio (FCR). If we only look at weight, we miss the moment when efficiency peaks.
+                    </p>
+                    <p>
+                        By applying <strong>Derivatives</strong> to the weight function $f(t)$, we determine exactly how many grams of body mass the bird is gaining at any specific point in its 42-day cycle. This allows husbandry experts to adjust protein intake right before the growth rate plateaus.
+                    </p>
+                    <div class="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-500">
+                        <p class="text-sm italic">
+                            Data Source Reference: Malaysian Agricultural Research and Development Institute (MARDI) - "Broiler Growth Performance in Tropical Environments" & DVS Malaysia Poultry Statistics.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-2xl shadow-sm border-t-4 border-emerald-600">
+                <h2 class="text-2xl font-bold text-emerald-700 mb-4">The Mathematics</h2>
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-xs font-bold uppercase text-slate-400 tracking-wider">The Weight Function (Logistic)</span>
+                        <div class="math-font text-xl text-slate-800 bg-white p-3 rounded-md border mt-2">
+                            f(x) = L / (1 + e<sup>-k(x-x₀)</sup>)
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">Where L = Max weight (2800g), k = growth constant, x₀ = peak growth day (day 28).</p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase text-slate-400 tracking-wider">The Growth Rate (Derivative)</span>
+                        <div class="math-font text-xl text-emerald-600 bg-white p-3 rounded-md border mt-2">
+                            f'(x) = (L · k · e<sup>-k(x-x₀)</sup>) / (1 + e<sup>-k(x-x₀)</sup>)²
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">f'(x) represents the weight gain in grams per day at time x.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card p-6 rounded-2xl shadow-md">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Growth Projection & Rate Analysis</h2>
+                    <p class="text-slate-500">Click anywhere on the line to calculate the derivative at that specific age.</p>
+                </div>
+                <div id="status-badge" class="mt-4 md:mt-0 px-4 py-2 bg-emerald-100 text-emerald-800 rounded-full text-sm font-semibold animate-pulse">
+                    Waiting for input...
+                </div>
+            </div>
+
+            <div class="relative h-[400px] w-full">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </section>
+
+        <section id="analysis-box" class="hidden glass-card p-6 rounded-2xl shadow-lg border-2 border-emerald-500 transition-all duration-500 bg-white">
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center md:border-r border-slate-100">
+                    <p class="text-sm text-slate-500 uppercase font-bold">Bird Age</p>
+                    <p id="res-age" class="text-4xl font-bold text-slate-800">--</p>
+                    <p class="text-xs text-slate-400 italic">Day of Cycle</p>
+                </div>
+                <div class="text-center md:border-r border-slate-100">
+                    <p class="text-sm text-slate-500 uppercase font-bold">Inst. Growth Rate [f'(x)]</p>
+                    <p id="res-rate" class="text-4xl font-bold text-emerald-600">--</p>
+                    <p class="text-xs text-slate-400 italic">Grams/Day Gain</p>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <p class="text-sm text-slate-500 uppercase font-bold mb-1">Husbandry Insight</p>
+                    <p id="res-insight" class="text-sm text-slate-600 leading-tight">Click the graph to analyze biological efficiency.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-10 px-4 mt-12">
+        <div class="max-w-6xl mx-auto text-center text-sm">
+            <p>© 2024 Applied Calculus for Animal Husbandry Technology (SFH).</p>
+            <p class="mt-2 italic">Educational tool for understanding biological growth dynamics in tropical climates.</p>
+        </div>
+    </footer>
+
+    <script>
+        const L = 2800; // Asymptotic weight in grams
+        const k = 0.16; // Growth rate coefficient for tropical conditions
+        const x0 = 28;  // Day of maximum growth acceleration (inflection point)
+        const days = Array.from({length: 43}, (_, i) => i);
+
+        // f(x): Cumulative weight function
+        function f(x) {
+            return L / (1 + Math.exp(-k * (x - x0)));
+        }
+
+        // f'(x): Derivative function (Instantaneous Growth Rate)
+        function fPrime(x) {
+            const expTerm = Math.exp(-k * (x - x0));
+            const numerator = L * k * expTerm;
+            const denominator = Math.pow(1 + expTerm, 2);
+            return numerator / denominator;
+        }
+
+        const weightData = days.map(d => f(d));
+        const rateData = days.map(d => fPrime(d));
+
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [
+                    {
+                        label: 'Body Weight f(x) [grams]',
+                        data: weightData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 4,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Growth Rate f\'(x) [g/day]',
+                        data: rateData,
+                        borderColor: '#0284c7',
+                        borderDash: [5, 5],
+                        borderWidth: 2,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Bird Age (Days)', font: { weight: 'bold' } } },
+                    y: { 
+                        type: 'linear', 
+                        display: true, 
+                        position: 'left',
+                        title: { display: true, text: 'Cumulative Weight (g)' }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Rate of Change (g/day)' },
+                        grid: { drawOnChartArea: false }
+                    }
+                },
+                onClick: (e, activeElements) => {
+                    if (activeElements.length > 0) {
+                        const index = activeElements[0].index;
+                        updateAnalysis(index);
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateAnalysis(day) {
+            const weight = f(day).toFixed(0);
+            const rate = fPrime(day).toFixed(2);
+            
+            const analysisBox = document.getElementById('analysis-box');
+            const statusBadge = document.getElementById('status-badge');
+            
+            analysisBox.classList.remove('hidden');
+            statusBadge.innerText = `Analyzing Day ${day}`;
+            statusBadge.classList.remove('animate-pulse');
+
+            document.getElementById('res-age').innerText = `${day}`;
+            document.getElementById('res-rate').innerText = `${rate}`;
+            
+            let insight = "";
+            if(day < 14) {
+                insight = "Brooding Phase: The derivative is low but increasing. High focus on metabolic start and temperature control.";
+            } else if (day >= 21 && day <= 32) {
+                insight = "Exponential Phase: The derivative f'(x) is peaking. This is the period of highest metabolic demand and feed efficiency.";
+            } else if (day > 35) {
+                insight = "Diminishing Returns: The derivative is decreasing. The bird's maintenance energy is rising; consider marketing or harvesting soon.";
+            } else {
+                insight = "Steady Growth: The rate of change is consistent. Monitor feed quality carefully.";
+            }
+            
+            document.getElementById('res-insight').innerText = insight;
+
+            // Highlight in chart (custom effect)
+            chart.setActiveElements([{ datasetIndex: 0, index: day }, { datasetIndex: 1, index: day }]);
+            chart.update();
+        }
+
+        window.onload = function() {
+            console.log("Animal Husbandry Growth Simulator Loaded.");
+        };
+    </script>
+</body>
+</html>
